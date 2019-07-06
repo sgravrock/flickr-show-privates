@@ -8,7 +8,7 @@ import (
 )
 
 func Run(baseUrl string, authenticator auth.Authenticator,
-	stdout io.Writer, stderr io.Writer) int {
+	stdout io.Writer, stderr io.Writer) error {
 
 	ftg := application{
 		baseUrl:       baseUrl,
@@ -26,11 +26,10 @@ type application struct {
 	stderr        io.Writer
 }
 
-func (app *application) Run() int {
+func (app *application) Run() error {
 	httpClient, err := app.authenticator.Authenticate()
 	if err != nil {
-		fmt.Fprintln(app.stderr, err.Error())
-		return 1
+		return err
 	}
 
 	flickrClient := flickrapi.NewClient(httpClient, "https://api.flickr.com")
@@ -38,42 +37,34 @@ func (app *application) Run() int {
 	fmt.Fprintln(app.stdout, "Downloading photo list")
 	photolist, err := flickrClient.GetPhotos(500)
 	if err != nil {
-		fmt.Fprintln(app.stderr, err.Error())
-		return 1
+		return err
 	}
 
 	for i := 0; i < len(photolist); i++ {
 		isPublic, err := photolist[i].IsPublic()
 		if err != nil {
-			fmt.Fprintln(app.stderr, err.Error())
-			return 1
+			return err
 		}
 
 		isFamily, err := photolist[i].IsFamily()
 		if err != nil {
-			fmt.Fprintln(app.stderr, err.Error())
-			return 1
+			return err
 		}
 
 		isFriend, err := photolist[i].IsFriend()
 		if err != nil {
-			fmt.Fprintln(app.stderr, err.Error())
-			return 1
+			return err
 		}
-
 
 		if !(isPublic || isFamily || isFriend) {
 			id, err := photolist[i].Id()
 			if err != nil {
-				fmt.Fprintln(app.stderr, err.Error())
-				return 1
+				return err
 			}
 
 			fmt.Println(id)
 		}
 	}
 
-	fmt.Printf("Got %d photos\n", len(photolist))
-
-	return 0
+	return nil
 }

@@ -19,7 +19,7 @@ var _ = Describe("App", func() {
 		ts            *ghttp.Server
 		stdout        *bytes.Buffer
 		stderr        *bytes.Buffer
-		retval        int
+		err           error
 	)
 
 	BeforeEach(func() {
@@ -38,7 +38,7 @@ var _ = Describe("App", func() {
 	})
 
 	JustBeforeEach(func() {
-		retval = Run(ts.URL(), authenticator, stdout, stderr)
+		err = Run(ts.URL(), authenticator, stdout, stderr)
 	})
 
 	It("authenticates the user", func() {
@@ -50,8 +50,8 @@ var _ = Describe("App", func() {
 			authenticator.AuthenticateReturns(nil, errors.New("nope"))
 		})
 
-		It("returns nonzero", func() {
-			Expect(retval).NotTo(Equal(0))
+		It("returns an error", func() {
+			Expect(err).NotTo(BeNil())
 		})
 	})
 })
