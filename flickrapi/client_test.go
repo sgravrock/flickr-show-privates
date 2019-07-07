@@ -90,7 +90,6 @@ var _ = Describe("flickrapi.Client", func() {
 		})
 
 		Context("with a 200 response describing an error", func() {
-			var result map[string]interface{}
 			var err error
 
 			BeforeEach(func() {
@@ -104,7 +103,7 @@ var _ = Describe("flickrapi.Client", func() {
 						ghttp.RespondWith(200, json),
 					),
 				)
-				result, err = subject.Get("flickr.test.login", nil)
+				_, err = subject.Get("flickr.test.login", nil)
 			})
 
 			It("should return an error", func() {
@@ -114,7 +113,6 @@ var _ = Describe("flickrapi.Client", func() {
 		})
 
 		Context("with a non-200 response", func() {
-			var result map[string]interface{}
 			var err error
 
 			BeforeEach(func() {
@@ -126,7 +124,7 @@ var _ = Describe("flickrapi.Client", func() {
 						ghttp.RespondWith(500, "oops"),
 					),
 				)
-				result, err = subject.Get("flickr.test.login", nil)
+				_, err = subject.Get("flickr.test.login", nil)
 			})
 
 			It("should return an error", func() {
